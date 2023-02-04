@@ -1,0 +1,287 @@
+﻿@model IEnumerable<Demo.Net.Models.User>
+
+@{
+    ViewBag.Title = "Home Page";
+}
+
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+<head runat="server">
+    <title></title>
+    <script src="~/Scripts/jquery-3.4.1.js"></script>
+</head>
+<body>
+
+    
+        <div style="margin-top:20px">
+            <input type="text" id="txt1" />
+            <br />
+            <button onclick="GetValue()" id="btnGetValue" class="btn btn-primary">Get Value</button>
+            <div id="div1"></div>
+        </div>
+ 
+    <h2>Quản lý người dùng</h2>
+    <div class="page-breadcrumb">
+        <div class="row">
+            <div class="col-12 d-flex no-block align-items-center">
+                <a onclick="Create()" class="btn btn-success" style="margin-bottom: 5px; margin-left: 5px; width: 150px;">
+                    Thêm<i class="fas fa-plus"></i>
+                </a>
+            </div>
+        </div>
+    </div>
+    <table class="table">
+        <tr>
+            <th>
+                Họ và tên
+            </th>
+            <th>
+                Email
+            </th>
+            <th>
+                Số điện thoại
+            </th>
+            <th></th>
+        </tr>
+        @foreach (var item in Model)
+        {
+            <tr id="@item.id">
+                <td>
+                    @Html.DisplayFor(modelItem => item.name)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.email)
+                </td>
+                <td>
+                    @Html.DisplayFor(modelItem => item.phone)
+                </td>
+                <td>
+                    <button name="update" class="btn btn-primary">
+                        Sửa
+                    </button>
+                    <button name="delete" class="btn btn-danger">
+                        Xóa
+                    </button>
+                </td>
+            </tr>
+        }
+    </table>
+    <div id="modalCreate" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Thêm người dùng</h4>
+                </div>
+                <div class="">
+                    <div class="col-md-12" style="padding-bottom: 12px;padding-top: 12px;">
+                        <div class="col-md-4"><span>Họ và tên:</span></div>
+                        <div class="col-md-8">
+                            <input id="userName" type="text" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <div class="col-md-12" style="padding-bottom: 12px;padding-top: 12px;">
+                        <div class="col-md-4"><span>Email:</span></div>
+                        <div class="col-md-8">
+                            <input id="email" type="text" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <div class="col-md-12" style="padding-bottom: 12px;padding-top: 12px;">
+                        <div class="col-md-4"><span>Số điện thoại:</span></div>
+                        <div class="col-md-8">
+                            <input id="phone" type="text" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button onclick="HideModal()" type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                    <button id="btnCreate" class="btn btn-primary" type="submit">Thêm</button>
+                </div>
+            </div>
+        </div>
+    </div>
+    <div id="modalUpdate" class="modal fade" role="dialog">
+        <div class="modal-dialog">
+            <!-- Modal content-->
+            <div class="modal-content">
+                <div class="modal-header">
+                    <button type="button" class="close" data-dismiss="modal">&times;</button>
+                    <h4 class="modal-title">Cập nhật người dùng</h4>
+                </div>
+                <input hidden id="id_user" value=""/>
+                <div class="">
+                    <div class="col-md-12" style="padding-bottom: 12px;padding-top: 12px;">
+                        <div class="col-md-4"><span>Họ và tên:</span></div>
+                        <div class="col-md-8">
+                            <input id="up_userName" type="text" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <div class="col-md-12" style="padding-bottom: 12px;padding-top: 12px;">
+                        <div class="col-md-4"><span>Email:</span></div>
+                        <div class="col-md-8">
+                            <input id="up_email" type="text" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+                <div class="">
+                    <div class="col-md-12" style="padding-bottom: 12px;padding-top: 12px;">
+                        <div class="col-md-4"><span>Số điện thoại:</span></div>
+                        <div class="col-md-8">
+                            <input id="up_phone" type="text" class="form-control" />
+                        </div>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button onclick="HideModal()" type="button" class="btn btn-default" data-dismiss="modal">Đóng</button>
+                    <button id="btnUpdate" class="btn btn-primary" type="submit">Cập nhật</button>
+                </div>
+            </div>
+        </div>
+    </div>
+</body>
+</html>
+<script type="text/javascript">
+
+    function getValues_Success(msg) {
+        $('#div1').html(msg);
+    }
+    function getValues_Fail(msg) {
+        alert(msg.get_message());
+    }
+
+    function GetValue() {
+        var formData = new FormData();
+        var value = $("#txt1").val();
+            formData.append("value", value);
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("GetValues", "Home")',
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: function (data) {
+
+                    $('#div1').html(data.message);
+                }
+             })
+    }
+    //Hiển thị modal tạo
+    function Create() {
+        $("#modalCreate").modal("show");
+    }
+
+
+    //Tạo thông tin người dùng
+    $(document).ready(function () {
+        $('#btnCreate').click(function () {
+            var formData = new FormData();
+            var userName = $("#userName").val();
+            var email = $("#email").val();
+            var phone = $("#phone").val();
+            formData.append("userName", userName);
+            formData.append("email", email);
+            formData.append("phone", phone);
+            $.ajax({
+                type: 'POST',
+                url: '@Url.Action("Create", "Home")',
+                contentType: false,
+                processData: false,
+                data: formData,
+                success: function (data) {
+                    if (data.success == false) {
+                        alert(data.message);
+                    } else {
+                        $("#myModal").modal("hide");
+                        alert(data.message);
+                        location.reload();
+                    }
+                }
+             })
+        })
+    })
+
+    //Lấy thông tin người dùng để cập nhật
+    $(document).on('click', "button[name=update]", function () {
+        let id_user = $(this).closest('tr').attr('id');
+        $.ajax({
+            url:'@Url.Action("Update", "Home")' ,
+            type: 'get',
+            data: {
+                id: id_user
+            },
+            success: function (data) {
+                if (data.success == true) {
+                    $('#up_userName').val(data.U.name);
+                    $('#up_email').val(data.U.email);
+                    $('#up_phone').val(data.U.phone);
+                    $('#id_user').val(id_user);
+
+                    $('#modalUpdate').modal();
+                } else {
+                    alert(data.message);
+                }
+            }
+        })
+    })
+
+    //Cập nhật thông tin người dùng
+    $('#btnUpdate').click(function () {
+        let id_user = $('#id_user').val();
+        let userName = $('#up_userName').val();
+        let email = $('#up_email').val();
+        let phone = $('#up_phone').val();
+        $.ajax({
+            type: 'POST',
+            url: '@Url.Action("UpdateUser", "Home")',
+            data: {
+                id: id_user,
+                userName: userName,
+                email: email,
+                phone: phone
+            },
+            success: function (data) {
+                    if (data.success == true) {
+                        alert(data.message);
+                        $('#modalUpdate').modal('hide');
+                        location.reload();
+                    } else {
+                        alert(data.message);
+                    }
+                }
+             })
+    })
+
+    //Sự kiện xóa
+    $(document).on('click', "button[name=delete]", function () {
+        let id_user = $(this).closest('tr').attr('id');
+        if (confirm("Bạn thực sự muốn xóa người dùng này?")) {
+            $.ajax({
+                url: '@Url.Action("Delete", "Home")',
+                type: 'POST',
+                data: {
+                    id: id_user
+                },
+                success: function (data) {
+                     if (data.success == true) {
+                         alert(data.message);
+                         location.reload();
+                     } else {
+                         alert(data.message);
+                     }
+                }
+            })
+        }
+    })
+
+</script>
